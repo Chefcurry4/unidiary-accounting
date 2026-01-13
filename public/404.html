@@ -4,20 +4,15 @@
   <meta charset="UTF-8">
   <title>UniDiary Accounting</title>
   <script>
-    // Single Page App routing fix for GitHub Pages
+    // Single Page App routing fix for Netlify
     // This script redirects 404s to index.html while preserving the path
-    const pathSegmentsToKeep = 1; // Keep repo name segment
     const location = window.location;
-    const path = location.pathname.split('/').slice(pathSegmentsToKeep + 1).join('/');
+    const path = location.pathname;
     const search = location.search;
     const hash = location.hash;
-    
+
     sessionStorage.setItem('redirect', path + search + hash);
-    window.location.replace(
-      location.origin + 
-      location.pathname.split('/').slice(0, pathSegmentsToKeep + 1).join('/') + 
-      '/'
-    );
+    window.location.replace(location.origin + '/');
   </script>
 </head>
 <body>
