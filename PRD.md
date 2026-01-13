@@ -12,6 +12,20 @@ This is a focused expense tracking tool with dashboard, budget management, and u
 
 ## Essential Features
 
+### Navigation & Menu
+- **Functionality**: Hamburger menu providing navigation between Home (dashboard) and Profile pages
+- **Purpose**: Allows users to access different sections of the internal tool and manage their personal information
+- **Trigger**: Click hamburger icon in header
+- **Progression**: Click menu icon → Sheet slides from left → User sees Home/Profile options with icons → Click option → Sheet closes → Page transitions → Active page highlighted
+- **Success criteria**: Menu opens/closes smoothly, active page is visually indicated, navigation works instantly
+
+### Profile Management
+- **Functionality**: Display and edit user profile information including bio, company, location, phone number, and GitHub details
+- **Purpose**: Personalizes the internal tool experience and stores user information for team identification
+- **Trigger**: Click Profile in hamburger menu
+- **Progression**: Navigate to Profile → GitHub user data loads → Avatar and username display → Click Edit Profile → Form fields become editable → Update information → Click Save → Data persists to KV store → Success toast
+- **Success criteria**: GitHub user data fetches correctly, profile edits save to local storage, owner badge displays for app owners
+
 ### Dashboard Overview
 - **Functionality**: Displays key metrics including total expenses, remaining budget, top categories, and upcoming payments
 - **Purpose**: Provides at-a-glance financial health check for startup founders
