@@ -93,7 +93,11 @@ export function useExpenses(userId?: string) {
   useEffect(() => {
     if (userId) {
       fetchExpenses()
+    } else {
+      setExpenses([])
+      setLoading(false)
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [userId])
 
   return {

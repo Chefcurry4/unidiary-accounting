@@ -15,7 +15,7 @@ CREATE TABLE IF NOT EXISTS expenses (
   description TEXT NOT NULL,
   date TEXT NOT NULL,
   isRecurring BOOLEAN NOT NULL DEFAULT false,
-  recurrenceInterval TEXT,
+  recurrenceInterval TEXT DEFAULT 'none',
   nextDueDate TEXT,
   isPaid BOOLEAN DEFAULT false,
   createdAt TIMESTAMP WITH TIME ZONE DEFAULT NOW()

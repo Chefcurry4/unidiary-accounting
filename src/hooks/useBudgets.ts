@@ -93,7 +93,11 @@ export function useBudgets(userId?: string) {
   useEffect(() => {
     if (userId) {
       fetchBudgets()
+    } else {
+      setBudgets([])
+      setLoading(false)
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [userId])
 
   return {
