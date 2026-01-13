@@ -1,4 +1,4 @@
-# UniDiary Accounting - Interactive Expense Management Platform
+# UniDiary Accounting
 
 An elegant, Aurora-themed expense management platform designed specifically for startups. Track expenses, manage budgets, and visualize financial data with a stunning dark interface featuring animated gradients and frosted-glass UI components.
 
