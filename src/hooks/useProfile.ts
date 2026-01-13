@@ -44,11 +44,9 @@ export function useProfile(userId?: string) {
 
   const updateProfile = async (id: string, updates: Partial<ProfileData>) => {
     try {
-      // Try to update first
       const { data, error } = await supabase
         .from('profiles')
         .upsert({ userId: id, ...updates })
-        .eq('userId', id)
         .select()
 
       if (error) throw error

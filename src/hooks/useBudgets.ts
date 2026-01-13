@@ -27,14 +27,9 @@ export function useBudgets() {
 
   const addBudget = async (budget: Omit<Budget, 'id' | 'createdAt'>) => {
     try {
-      const newBudget = {
-        ...budget,
-        createdAt: new Date().toISOString()
-      }
-
       const { data, error } = await supabase
         .from('budgets')
-        .insert([newBudget])
+        .insert([budget])
         .select()
 
       if (error) throw error
