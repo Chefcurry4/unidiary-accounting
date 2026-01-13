@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react'
 import { supabase } from '../lib/supabase'
 import { Expense } from '../lib/types'
 
-export function useExpenses() {
+export function useExpenses(userId?: string) {
   const [expenses, setExpenses] = useState<Expense[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<Error | null>(null)
@@ -10,10 +10,17 @@ export function useExpenses() {
   const fetchExpenses = async () => {
     try {
       setLoading(true)
-      const { data, error } = await supabase
+      let query = supabase
         .from('expenses')
         .select('*')
         .order('createdAt', { ascending: false })
+
+      // Filter by user_id if RLS is enabled and userId is provided
+      if (userId) {
+        query = query.eq('user_id', userId)
+      }
+
+      const { data, error } = await query
 
       if (error) throw error
       setExpenses(data || [])
@@ -27,9 +34,10 @@ export function useExpenses() {
 
   const addExpense = async (expense: Omit<Expense, 'id' | 'createdAt'>) => {
     try {
+      const expenseData = userId ? { ...expense, user_id: userId } : expense
       const { data, error } = await supabase
         .from('expenses')
-        .insert([expense])
+        .insert([expenseData])
         .select()
 
       if (error) throw error
@@ -83,8 +91,10 @@ export function useExpenses() {
   }
 
   useEffect(() => {
-    fetchExpenses()
-  }, [])
+    if (userId) {
+      fetchExpenses()
+    }
+  }, [userId])
 
   return {
     expenses,
