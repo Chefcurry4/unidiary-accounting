@@ -6,17 +6,10 @@ import { Label } from './ui/label'
 import { Textarea } from './ui/textarea'
 import { Avatar, AvatarFallback, AvatarImage } from './ui/avatar'
 import { useProfile } from '../hooks/useProfile'
+import { useAuth } from '../contexts/AuthContext'
 import { toast } from 'sonner'
 import { User, Envelope, Buildings, MapPin, PencilSimple, FloppyDisk } from '@phosphor-icons/react'
 import { motion } from 'framer-motion'
-
-interface UserInfo {
-  avatarUrl: string
-  email: string
-  id: number
-  isOwner: boolean
-  login: string
-}
 
 interface ProfileData {
   bio: string
@@ -26,7 +19,7 @@ interface ProfileData {
 }
 
 export function ProfilePage() {
-  const [user, setUser] = useState<UserInfo | null>(null)
+  const { user } = useAuth()
   const { profileData, updateProfile } = useProfile(user?.id.toString())
   const [isEditing, setIsEditing] = useState(false)
   const [formData, setFormData] = useState<ProfileData>(profileData || {
@@ -35,18 +28,6 @@ export function ProfilePage() {
     company: '',
     phone: ''
   })
-
-  useEffect(() => {
-    const fetchUser = async () => {
-      try {
-        const userData = await window.spark.user()
-        setUser(userData)
-      } catch (error) {
-        console.error('Failed to fetch user:', error)
-      }
-    }
-    fetchUser()
-  }, [])
 
   useEffect(() => {
     if (profileData) {

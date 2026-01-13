@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useExpenses } from '../hooks/useExpenses'
 import { useBudgets } from '../hooks/useBudgets'
 import { StatsOverview } from './StatsOverview'
@@ -10,19 +10,29 @@ import { ExpenseForm, ExpenseFormData } from './ExpenseForm'
 import { Button } from './ui/button'
 import { toast } from 'sonner'
 import { Expense } from '../lib/types'
+import { isSupabaseConfigured } from '../lib/supabase'
 import { 
   calculateCategoryStats, 
   filterExpensesByMonth, 
   calculateMonthlyTrends,
   getUpcomingExpenses
 } from '../lib/expense-utils'
-import { Plus, ChartBar } from '@phosphor-icons/react'
+import { Plus, ChartBar, Warning } from '@phosphor-icons/react'
 import { motion } from 'framer-motion'
 
 export function HomePage() {
   const { expenses, addExpense, deleteExpense, updateExpense } = useExpenses()
   const { budgets } = useBudgets()
   const [isExpenseFormOpen, setIsExpenseFormOpen] = useState(false)
+
+  useEffect(() => {
+    if (!isSupabaseConfigured) {
+      toast.warning(
+        'Supabase not configured. Please update .env with your Supabase credentials.',
+        { duration: 5000 }
+      )
+    }
+  }, [])
 
   const handleAddExpense = async (formData: ExpenseFormData) => {
     try {
@@ -76,6 +86,23 @@ export function HomePage() {
   return (
     <>
       <div className="container mx-auto px-4 py-8 space-y-8">
+        {!isSupabaseConfigured && (
+          <motion.div
+            initial={{ opacity: 0, y: -10 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="bg-warning-bg border border-warning-border rounded-lg p-4 flex items-start gap-3"
+          >
+            <Warning className="text-warning mt-0.5" size={20} />
+            <div className="flex-1">
+              <h3 className="font-semibold text-warning mb-1">Database Not Connected</h3>
+              <p className="text-sm text-foreground/80">
+                Supabase is not properly configured. Please update your <code className="bg-background/50 px-1 rounded">.env</code> file with valid Supabase credentials.
+                Data will not be persisted until the connection is established.
+              </p>
+            </div>
+          </motion.div>
+        )}
+        
         <div className="flex items-center justify-between mb-6">
           <div>
             <h2 className="text-2xl font-semibold text-foreground">Dashboard</h2>
