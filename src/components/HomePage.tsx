@@ -90,7 +90,7 @@ export function HomePage() {
           <motion.div
             initial={{ opacity: 0, y: -10 }}
             animate={{ opacity: 1, y: 0 }}
-            className="bg-warning/10 border border-warning/30 rounded-lg p-4 flex items-start gap-3"
+            className="bg-warning-bg border border-warning-border rounded-lg p-4 flex items-start gap-3"
           >
             <Warning className="text-warning mt-0.5" size={20} />
             <div className="flex-1">

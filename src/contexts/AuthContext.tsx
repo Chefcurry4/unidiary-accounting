@@ -25,10 +25,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     checkAuth()
   }, [])
 
+  const fetchUser = async (): Promise<UserInfo> => {
+    return await window.spark.user()
+  }
+
   const checkAuth = async () => {
     try {
       setIsLoading(true)
-      const userData = await window.spark.user()
+      const userData = await fetchUser()
       setUser(userData)
     } catch (error) {
       console.error('Failed to fetch user:', error)
@@ -40,7 +44,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const login = async () => {
     try {
-      const userData = await window.spark.user()
+      const userData = await fetchUser()
       setUser(userData)
     } catch (error) {
       console.error('Login failed:', error)
