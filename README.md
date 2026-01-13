@@ -8,6 +8,13 @@ An elegant, Aurora-themed expense management platform designed specifically for 
 
 ## ✨ Features
 
+### 🔐 Secure Authentication
+- User registration with email and password
+- Secure login system powered by Supabase Auth
+- Protected routes requiring authentication
+- Personal data isolation with Row Level Security
+- Sign-out functionality
+
 ### 📊 Dashboard Overview
 - Real-time financial metrics and statistics
 - Total expenses tracking (monthly and all-time)
@@ -131,66 +138,36 @@ The animated background blobs use these colors:
 - Pink: `#fa709a`
 - Blue: `#2980b9`
 
-## 💾 Data Persistence
+## 💾 Data Persistence & Authentication
 
-UniDiary uses Supabase for backend data persistence:
+UniDiary uses Supabase for backend data persistence and authentication:
 
-- **Expenses**: Stored in the `expenses` table
-- **Budgets**: Stored in the `budgets` table
-- **Profiles**: Stored in the `profiles` table
+- **Authentication**: Secure user authentication with email/password using Supabase Auth
+- **Expenses**: Stored in the `expenses` table with user isolation
+- **Budgets**: Stored in the `budgets` table with user isolation
+- **Profiles**: Stored in the `profiles` table with user-specific data
 
 ### Setup Instructions
 
 1. Create a Supabase project at [supabase.com](https://supabase.com)
-2. Create the following tables in your Supabase database:
 
-**Expenses Table:**
-```sql
-CREATE TABLE expenses (
-  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-  amount NUMERIC NOT NULL,
-  category TEXT NOT NULL,
-  description TEXT NOT NULL,
-  date TEXT NOT NULL,
-  isRecurring BOOLEAN NOT NULL DEFAULT false,
-  recurrenceInterval TEXT,
-  nextDueDate TEXT,
-  isPaid BOOLEAN DEFAULT false,
-  createdAt TIMESTAMP WITH TIME ZONE DEFAULT NOW()
-);
-```
-
-**Budgets Table:**
-```sql
-CREATE TABLE budgets (
-  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-  category TEXT NOT NULL,
-  amount NUMERIC NOT NULL,
-  period TEXT NOT NULL,
-  startDate TEXT NOT NULL,
-  createdAt TIMESTAMP WITH TIME ZONE DEFAULT NOW()
-);
-```
-
-**Profiles Table:**
-```sql
-CREATE TABLE profiles (
-  userId TEXT PRIMARY KEY,
-  bio TEXT,
-  location TEXT,
-  company TEXT,
-  phone TEXT
-);
-```
+2. Run the database schema from `supabase/schema.sql` in your Supabase SQL Editor. This will:
+   - Create the expenses, budgets, and profiles tables
+   - Set up Row Level Security (RLS) policies for data isolation
+   - Configure user authentication integration
 
 3. Copy `.env.example` to `.env` and fill in your Supabase credentials:
    ```bash
    cp .env.example .env
    ```
 
-4. Update the environment variables with your Supabase project URL and anon key.
+4. Update the environment variables with your Supabase project URL and anon key:
+   ```env
+   VITE_SUPABASE_URL=your-supabase-project-url
+   VITE_SUPABASE_ANON_KEY=your-supabase-anon-key
+   ```
 
-All data is stored securely in Supabase and synced in real-time.
+All data is stored securely in Supabase with Row Level Security ensuring users can only access their own data.
 
 ## 🔧 Available Scripts
 

@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react'
 import { supabase } from '../lib/supabase'
 import { Budget } from '../lib/types'
 
-export function useBudgets() {
+export function useBudgets(userId?: string) {
   const [budgets, setBudgets] = useState<Budget[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<Error | null>(null)
@@ -10,10 +10,17 @@ export function useBudgets() {
   const fetchBudgets = async () => {
     try {
       setLoading(true)
-      const { data, error } = await supabase
+      let query = supabase
         .from('budgets')
         .select('*')
         .order('createdAt', { ascending: false })
+
+      // Filter by user_id if RLS is enabled and userId is provided
+      if (userId) {
+        query = query.eq('user_id', userId)
+      }
+
+      const { data, error } = await query
 
       if (error) throw error
       setBudgets(data || [])
@@ -27,9 +34,10 @@ export function useBudgets() {
 
   const addBudget = async (budget: Omit<Budget, 'id' | 'createdAt'>) => {
     try {
+      const budgetData = userId ? { ...budget, user_id: userId } : budget
       const { data, error } = await supabase
         .from('budgets')
-        .insert([budget])
+        .insert([budgetData])
         .select()
 
       if (error) throw error
@@ -83,8 +91,14 @@ export function useBudgets() {
   }
 
   useEffect(() => {
-    fetchBudgets()
-  }, [])
+    if (userId) {
+      fetchBudgets()
+    } else {
+      setBudgets([])
+      setLoading(false)
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [userId])
 
   return {
     budgets,

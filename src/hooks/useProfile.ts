@@ -24,7 +24,7 @@ export function useProfile(userId?: string) {
       const { data, error } = await supabase
         .from('profiles')
         .select('*')
-        .eq('userId', id)
+        .eq('user_id', id)
         .single()
 
       if (error && error.code !== 'PGRST116') { // PGRST116 is "not found" error
@@ -46,7 +46,7 @@ export function useProfile(userId?: string) {
     try {
       const { data, error } = await supabase
         .from('profiles')
-        .upsert({ userId: id, ...updates })
+        .upsert({ user_id: id, ...updates })
         .select()
 
       if (error) throw error

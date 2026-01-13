@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { useExpenses } from '../hooks/useExpenses'
 import { useBudgets } from '../hooks/useBudgets'
+import { useAuth } from '../contexts/AuthContext'
 import { StatsOverview } from './StatsOverview'
 import { UpcomingExpensesWidget } from './UpcomingExpensesWidget'
 import { CategoryChart, MonthlyTrendsChart, BudgetComparisonChart } from './Charts'
@@ -20,8 +21,9 @@ import { Plus, ChartBar } from '@phosphor-icons/react'
 import { motion } from 'framer-motion'
 
 export function HomePage() {
-  const { expenses, addExpense, deleteExpense, updateExpense } = useExpenses()
-  const { budgets } = useBudgets()
+  const { user } = useAuth()
+  const { expenses, addExpense, deleteExpense, updateExpense } = useExpenses(user?.id)
+  const { budgets } = useBudgets(user?.id)
   const [isExpenseFormOpen, setIsExpenseFormOpen] = useState(false)
 
   const handleAddExpense = async (formData: ExpenseFormData) => {
