@@ -8,11 +8,41 @@ import { AuthProvider, useAuth } from './contexts/AuthContext'
 import { Toaster } from 'sonner'
 import { motion } from 'framer-motion'
 import { Button } from './components/ui/button'
-import { SignOut } from '@phosphor-icons/react'
+import { SignOut, Warning } from '@phosphor-icons/react'
+
+function ConfigurationError() {
+  return (
+    <div className="min-h-screen flex items-center justify-center p-4 bg-background">
+      <div className="max-w-md w-full text-center">
+        <div className="mb-6">
+          <Warning size={64} className="mx-auto text-yellow-500" />
+        </div>
+        <h1 className="text-2xl font-bold text-foreground mb-4">Configuration Required</h1>
+        <p className="text-muted-foreground mb-6">
+          The application is missing required Supabase configuration. Please configure the following environment variables in Netlify:
+        </p>
+        <div className="bg-muted rounded-lg p-4 text-left mb-6">
+          <code className="text-sm">
+            <div className="mb-2"><span className="text-yellow-500">VITE_SUPABASE_URL</span>=your-project-url</div>
+            <div><span className="text-yellow-500">VITE_SUPABASE_ANON_KEY</span>=your-anon-key</div>
+          </code>
+        </div>
+        <p className="text-sm text-muted-foreground">
+          You can find these values in your Supabase project settings under API.
+        </p>
+      </div>
+    </div>
+  )
+}
 
 function AppContent() {
   const [currentPage, setCurrentPage] = useState<'home' | 'profile'>('home')
-  const { user, loading, signOut } = useAuth()
+  const { user, loading, signOut, configError } = useAuth()
+
+  // Show configuration error if Supabase is not configured
+  if (configError) {
+    return <ConfigurationError />
+  }
 
   // Show loading state while checking authentication
   if (loading) {
