@@ -1,5 +1,6 @@
 import { useState } from 'react'
-import { useKV } from '@github/spark/hooks'
+import { useExpenses } from '../hooks/useExpenses'
+import { useBudgets } from '../hooks/useBudgets'
 import { StatsOverview } from './StatsOverview'
 import { UpcomingExpensesWidget } from './UpcomingExpensesWidget'
 import { CategoryChart, MonthlyTrendsChart, BudgetComparisonChart } from './Charts'
@@ -8,7 +9,7 @@ import { BudgetOverview } from './BudgetOverview'
 import { ExpenseForm, ExpenseFormData } from './ExpenseForm'
 import { Button } from './ui/button'
 import { toast } from 'sonner'
-import { Expense, Budget } from '../lib/types'
+import { Expense } from '../lib/types'
 import { 
   calculateCategoryStats, 
   filterExpensesByMonth, 
@@ -19,38 +20,46 @@ import { Plus, ChartBar } from '@phosphor-icons/react'
 import { motion } from 'framer-motion'
 
 export function HomePage() {
-  const [expenses, setExpenses] = useKV<Expense[]>('expenses', [])
-  const [budgets, setBudgets] = useKV<Budget[]>('budgets', [])
+  const { expenses, addExpense, deleteExpense, updateExpense } = useExpenses()
+  const { budgets } = useBudgets()
   const [isExpenseFormOpen, setIsExpenseFormOpen] = useState(false)
 
-  const handleAddExpense = (formData: ExpenseFormData) => {
-    const newExpense: Expense = {
-      id: `exp-${Date.now()}`,
-      amount: formData.amount,
-      category: formData.category,
-      description: formData.description,
-      date: formData.date,
-      isRecurring: formData.isRecurring,
-      recurrenceInterval: formData.recurrenceInterval,
-      nextDueDate: formData.nextDueDate,
-      isPaid: false,
-      createdAt: new Date().toISOString()
+  const handleAddExpense = async (formData: ExpenseFormData) => {
+    try {
+      const newExpense: Omit<Expense, 'id' | 'createdAt'> = {
+        amount: formData.amount,
+        category: formData.category,
+        description: formData.description,
+        date: formData.date,
+        isRecurring: formData.isRecurring,
+        recurrenceInterval: formData.recurrenceInterval,
+        nextDueDate: formData.nextDueDate,
+        isPaid: false,
+      }
+
+      await addExpense(newExpense)
+      toast.success('Expense added successfully!')
+    } catch (error) {
+      toast.error('Failed to add expense')
     }
-
-    setExpenses((current) => [...(current || []), newExpense])
-    toast.success('Expense added successfully!')
   }
 
-  const handleDeleteExpense = (id: string) => {
-    setExpenses((current) => (current || []).filter(e => e.id !== id))
-    toast.success('Expense deleted')
+  const handleDeleteExpense = async (id: string) => {
+    try {
+      await deleteExpense(id)
+      toast.success('Expense deleted')
+    } catch (error) {
+      toast.error('Failed to delete expense')
+    }
   }
 
-  const handleMarkPaid = (id: string) => {
-    setExpenses((current) => 
-      (current || []).map(e => e.id === id ? { ...e, isPaid: true } : e)
-    )
-    toast.success('Expense marked as paid')
+  const handleMarkPaid = async (id: string) => {
+    try {
+      await updateExpense(id, { isPaid: true })
+      toast.success('Expense marked as paid')
+    } catch (error) {
+      toast.error('Failed to update expense')
+    }
   }
 
   const currentMonthExpenses = filterExpensesByMonth(expenses || [], new Date())
