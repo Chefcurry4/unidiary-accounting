@@ -2,12 +2,38 @@ import { useState } from 'react'
 import { GrainyBackground } from './components/GrainyBackground'
 import { HomePage } from './components/HomePage'
 import { ProfilePage } from './components/ProfilePage'
+import { LoginPage } from './components/LoginPage'
 import { HamburgerMenu } from './components/HamburgerMenu'
+import { AuthProvider, useAuth } from './contexts/AuthContext'
 import { Toaster } from 'sonner'
 import { motion } from 'framer-motion'
 
-function App() {
+function AppContent() {
+  const { user, isLoading, login } = useAuth()
   const [currentPage, setCurrentPage] = useState<'home' | 'profile'>('home')
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center text-foreground bg-background">
+        <GrainyBackground />
+        <div className="relative z-10">
+          <div className="text-center space-y-4">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto"></div>
+            <p className="text-muted-foreground">Loading...</p>
+          </div>
+        </div>
+      </div>
+    )
+  }
+
+  if (!user) {
+    return (
+      <>
+        <GrainyBackground />
+        <LoginPage onLogin={login} />
+      </>
+    )
+  }
 
   return (
     <div className="min-h-screen text-foreground">
@@ -52,6 +78,14 @@ function App() {
         </footer>
       </div>
     </div>
+  )
+}
+
+function App() {
+  return (
+    <AuthProvider>
+      <AppContent />
+    </AuthProvider>
   )
 }
 
