@@ -4,19 +4,12 @@ import { Button } from './ui/button'
 import { Input } from './ui/input'
 import { Label } from './ui/label'
 import { Textarea } from './ui/textarea'
-import { Avatar, AvatarFallback, AvatarImage } from './ui/avatar'
+import { Avatar, AvatarFallback } from './ui/avatar'
 import { useProfile } from '../hooks/useProfile'
+import { useAuth } from '../contexts/AuthContext'
 import { toast } from 'sonner'
 import { User, Envelope, Buildings, MapPin, PencilSimple, FloppyDisk } from '@phosphor-icons/react'
 import { motion } from 'framer-motion'
-
-interface UserInfo {
-  avatarUrl: string
-  email: string
-  id: number
-  isOwner: boolean
-  login: string
-}
 
 interface ProfileData {
   bio: string
@@ -26,8 +19,8 @@ interface ProfileData {
 }
 
 export function ProfilePage() {
-  const [user, setUser] = useState<UserInfo | null>(null)
-  const { profileData, updateProfile } = useProfile(user?.id.toString())
+  const { user } = useAuth()
+  const { profileData, updateProfile } = useProfile(user?.id)
   const [isEditing, setIsEditing] = useState(false)
   const [formData, setFormData] = useState<ProfileData>(profileData || {
     bio: '',
@@ -35,18 +28,6 @@ export function ProfilePage() {
     company: '',
     phone: ''
   })
-
-  useEffect(() => {
-    const fetchUser = async () => {
-      try {
-        const userData = await window.spark.user()
-        setUser(userData)
-      } catch (error) {
-        console.error('Failed to fetch user:', error)
-      }
-    }
-    fetchUser()
-  }, [])
 
   useEffect(() => {
     if (profileData) {
@@ -57,7 +38,7 @@ export function ProfilePage() {
   const handleSave = async () => {
     try {
       if (user) {
-        await updateProfile(user.id.toString(), formData)
+        await updateProfile(user.id, formData)
         setIsEditing(false)
         toast.success('Profile updated successfully!')
       }
@@ -84,8 +65,10 @@ export function ProfilePage() {
     )
   }
 
-  const initials = user.login
-    .split('')
+  const displayName = user.user_metadata?.display_name || user.email?.split('@')[0] || 'User'
+  const initials = displayName
+    .split(' ')
+    .map(n => n[0])
     .slice(0, 2)
     .join('')
     .toUpperCase()
@@ -101,26 +84,18 @@ export function ProfilePage() {
           <div className="flex items-start justify-between mb-8">
             <div className="flex items-center gap-6">
               <Avatar className="h-24 w-24 border-2 border-primary/30">
-                <AvatarImage src={user.avatarUrl} alt={user.login} />
                 <AvatarFallback className="bg-primary/20 text-primary text-2xl font-bold">
                   {initials}
                 </AvatarFallback>
               </Avatar>
               <div>
                 <h1 className="text-3xl font-bold text-foreground mb-1">
-                  {user.login}
+                  {displayName}
                 </h1>
                 <div className="flex items-center gap-2 text-muted-foreground">
                   <Envelope size={16} />
                   <span className="text-sm">{user.email || 'No email set'}</span>
                 </div>
-                {user.isOwner && (
-                  <div className="mt-2">
-                    <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-primary/20 text-primary border border-primary/30">
-                      Owner
-                    </span>
-                  </div>
-                )}
               </div>
             </div>
             
@@ -243,9 +218,9 @@ export function ProfilePage() {
         >
           <h2 className="text-xl font-semibold text-foreground mb-4">About This Profile</h2>
           <p className="text-muted-foreground text-sm leading-relaxed">
-            This is your internal profile for UniDiary Accounting. Your information is stored locally 
-            and used to personalize your experience within the expense management system. As this is 
-            an internal tool for your startup, you can update your details anytime.
+            This is your profile for UniDiary Accounting. Your information is securely stored 
+            in Supabase and used to personalize your experience within the expense management system. 
+            You can update your details anytime.
           </p>
         </motion.div>
       </motion.div>

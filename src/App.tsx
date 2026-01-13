@@ -2,13 +2,36 @@ import { useState } from 'react'
 import { GrainyBackground } from './components/GrainyBackground'
 import { HomePage } from './components/HomePage'
 import { ProfilePage } from './components/ProfilePage'
+import { AuthPage } from './components/AuthPage'
 import { HamburgerMenu } from './components/HamburgerMenu'
+import { AuthProvider, useAuth } from './contexts/AuthContext'
 import { Toaster } from 'sonner'
 import { motion } from 'framer-motion'
+import { Button } from './components/ui/button'
+import { SignOut } from '@phosphor-icons/react'
 
-function App() {
+function AppContent() {
   const [currentPage, setCurrentPage] = useState<'home' | 'profile'>('home')
+  const { user, loading, signOut } = useAuth()
 
+  // Show loading state while checking authentication
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center text-foreground">
+        <div className="text-center">
+          <div className="text-2xl mb-2">Loading...</div>
+          <div className="text-muted-foreground">Checking authentication</div>
+        </div>
+      </div>
+    )
+  }
+
+  // Show auth page if not logged in
+  if (!user) {
+    return <AuthPage onAuthSuccess={() => {}} />
+  }
+
+  // Show main app if logged in
   return (
     <div className="min-h-screen text-foreground">
       <GrainyBackground />
@@ -34,6 +57,15 @@ function App() {
                   </p>
                 </div>
               </div>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={signOut}
+                className="flex items-center gap-2"
+              >
+                <SignOut size={16} />
+                Sign Out
+              </Button>
             </div>
           </div>
         </motion.header>
@@ -52,6 +84,14 @@ function App() {
         </footer>
       </div>
     </div>
+  )
+}
+
+function App() {
+  return (
+    <AuthProvider>
+      <AppContent />
+    </AuthProvider>
   )
 }
 
