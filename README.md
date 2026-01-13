@@ -58,7 +58,7 @@ Replicates the stunning Aurora (Dark/Night) theme with:
 - **Animations**: Framer Motion
 - **Charts**: Recharts
 - **Icons**: Phosphor Icons React
-- **Data Persistence**: Spark KV Store
+- **Data Persistence**: Supabase (PostgreSQL backend)
 - **Notifications**: Sonner
 
 ## 📦 Installation
@@ -133,12 +133,64 @@ The animated background blobs use these colors:
 
 ## 💾 Data Persistence
 
-UniDiary uses the Spark KV Store for client-side data persistence:
+UniDiary uses Supabase for backend data persistence:
 
-- **Expenses**: Stored under the `expenses` key
-- **Budgets**: Stored under the `budgets` key
+- **Expenses**: Stored in the `expenses` table
+- **Budgets**: Stored in the `budgets` table
+- **Profiles**: Stored in the `profiles` table
 
-All data persists across sessions and is automatically synced.
+### Setup Instructions
+
+1. Create a Supabase project at [supabase.com](https://supabase.com)
+2. Create the following tables in your Supabase database:
+
+**Expenses Table:**
+```sql
+CREATE TABLE expenses (
+  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  amount NUMERIC NOT NULL,
+  category TEXT NOT NULL,
+  description TEXT NOT NULL,
+  date TEXT NOT NULL,
+  isRecurring BOOLEAN NOT NULL DEFAULT false,
+  recurrenceInterval TEXT,
+  nextDueDate TEXT,
+  isPaid BOOLEAN DEFAULT false,
+  createdAt TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+);
+```
+
+**Budgets Table:**
+```sql
+CREATE TABLE budgets (
+  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  category TEXT NOT NULL,
+  amount NUMERIC NOT NULL,
+  period TEXT NOT NULL,
+  startDate TEXT NOT NULL,
+  createdAt TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+);
+```
+
+**Profiles Table:**
+```sql
+CREATE TABLE profiles (
+  userId TEXT PRIMARY KEY,
+  bio TEXT,
+  location TEXT,
+  company TEXT,
+  phone TEXT
+);
+```
+
+3. Copy `.env.example` to `.env` and fill in your Supabase credentials:
+   ```bash
+   cp .env.example .env
+   ```
+
+4. Update the environment variables with your Supabase project URL and anon key.
+
+All data is stored securely in Supabase and synced in real-time.
 
 ## 🔧 Available Scripts
 

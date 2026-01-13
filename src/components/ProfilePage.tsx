@@ -5,7 +5,7 @@ import { Input } from './ui/input'
 import { Label } from './ui/label'
 import { Textarea } from './ui/textarea'
 import { Avatar, AvatarFallback, AvatarImage } from './ui/avatar'
-import { useKV } from '@github/spark/hooks'
+import { useProfile } from '../hooks/useProfile'
 import { toast } from 'sonner'
 import { User, Envelope, Buildings, MapPin, PencilSimple, FloppyDisk } from '@phosphor-icons/react'
 import { motion } from 'framer-motion'
@@ -27,12 +27,7 @@ interface ProfileData {
 
 export function ProfilePage() {
   const [user, setUser] = useState<UserInfo | null>(null)
-  const [profileData, setProfileData] = useKV<ProfileData>('user-profile', {
-    bio: '',
-    location: '',
-    company: '',
-    phone: ''
-  })
+  const { profileData, updateProfile } = useProfile(user?.id.toString())
   const [isEditing, setIsEditing] = useState(false)
   const [formData, setFormData] = useState<ProfileData>(profileData || {
     bio: '',
@@ -59,10 +54,16 @@ export function ProfilePage() {
     }
   }, [profileData])
 
-  const handleSave = () => {
-    setProfileData(formData)
-    setIsEditing(false)
-    toast.success('Profile updated successfully!')
+  const handleSave = async () => {
+    try {
+      if (user) {
+        await updateProfile(user.id.toString(), formData)
+        setIsEditing(false)
+        toast.success('Profile updated successfully!')
+      }
+    } catch (error) {
+      toast.error('Failed to update profile')
+    }
   }
 
   const handleCancel = () => {
